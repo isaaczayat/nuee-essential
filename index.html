@@ -326,32 +326,66 @@
   @keyframes sheen { to { transform: translateX(120%); } }
 
   /* ---------- hero ---------- */
+  /* la barra de aviso y el header ocupan ~7.2rem por encima del hero:
+     descontarlos evita que el titular caiga por debajo del borde */
   .hero {
     position: relative;
-    min-height: min(86vh, 800px);
+    min-height: calc(100vh - 7.2rem);
+    min-height: calc(100svh - 7.2rem);
     display: grid;
     background: var(--ink);
     overflow: hidden;
   }
-  .hero .ph { grid-area: 1 / 1; min-height: min(86vh, 800px); }
-  .hero .ph img { opacity: .95; will-change: transform; }
+  .hero .ph { grid-area: 1 / 1; min-height: inherit; }
+  /* la foto va fuera del flujo: si no, al ser cuadrada su alto intrinseco
+     (= ancho de la ventana) marca la altura del hero y empuja el titular
+     por debajo del borde inferior */
+  .hero .ph img {
+    position: absolute;
+    inset: 0;
+    opacity: .95;
+    will-change: transform;
+  }
   .hero .ph:hover img { transform: none; }
+  /* el texto se apoya abajo a la izquierda y la foto es clara justo ahi:
+     al velo vertical se le suma uno lateral para sostener la lectura */
   .hero__scrim {
     grid-area: 1 / 1;
-    background: linear-gradient(180deg, rgba(23,21,15,.34) 0%, rgba(23,21,15,.06) 38%, rgba(23,21,15,.78) 100%);
+    /* la foto esta posicionada, asi que pintaria por encima de un velo
+       estatico: hay que posicionar el velo tambien para que quede delante */
+    position: relative;
+    z-index: 1;
+    background:
+      linear-gradient(180deg, rgba(23,21,15,.38) 0%, rgba(23,21,15,.04) 26%, rgba(23,21,15,.50) 60%, rgba(23,21,15,.88) 100%),
+      linear-gradient(90deg, rgba(23,21,15,.72) 0%, rgba(23,21,15,.32) 38%, rgba(23,21,15,0) 70%);
+  }
+  /* en pantallas estrechas el texto ocupa todo el ancho, asi que el peso
+     lo tiene que llevar el velo vertical y no el lateral */
+  @media (max-width: 900px) {
+    .hero__scrim {
+      background:
+        linear-gradient(180deg, rgba(23,21,15,.30) 0%, rgba(23,21,15,.03) 22%, rgba(23,21,15,.52) 52%, rgba(23,21,15,.86) 100%),
+        linear-gradient(90deg, rgba(23,21,15,.22) 0%, rgba(23,21,15,.06) 55%, rgba(23,21,15,0) 100%);
+    }
   }
   .hero__body {
     grid-area: 1 / 1;
     align-self: end;
+    /* sin ancho explicito el margin:auto de .wrap impide que el elemento
+       de rejilla se estire y centra la caja en mitad del hero */
+    width: 100%;
     color: var(--paper);
     padding-block: clamp(2.5rem, 6vw, 5rem);
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    max-width: 44rem;
     position: relative;
     z-index: 2;
   }
+  /* el ancho se limita en los hijos, no en el contenedor: asi .wrap sigue
+     centrando su caja y el texto arranca en el mismo margen que el resto
+     de la pagina en vez de quedarse centrado en mitad del hero */
+  .hero__body > * { max-width: 44rem; }
   .hero__body .label { color: var(--gold-lt); }
   .hero__body .lede { color: rgba(251,248,242,.82); }
   .hero__cta { display: flex; flex-wrap: wrap; gap: .9rem; align-items: center; }
@@ -939,21 +973,33 @@
     }, 3500);
   }
 
-  /* ---------- 2. revelados al entrar en pantalla ---------- */
-  var targets = document.querySelectorAll('.rv, .rv-wipe, .zip-mask, .sheen');
+  /* ---------- 2. revelados al entrar en pantalla ----------
+     Barrido propio en vez de IntersectionObserver: si un elemento salta
+     de estar debajo del viewport a estar encima (enlace de ancla, carga
+     con hash, teclas Inicio/Fin), su ratio de interseccion es 0 antes y
+     despues, el observer no notifica nada y el elemento se quedaria
+     invisible para siempre. Comparar posiciones no puede saltarse nada. */
+  var pending = Array.prototype.slice.call(
+    document.querySelectorAll('.rv, .rv-wipe, .zip-mask, .sheen')
+  );
 
-  if (!('IntersectionObserver' in window) || reduce) {
-    Array.prototype.forEach.call(targets, function (el) { el.classList.add('in'); });
-  } else {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('in');
-        io.unobserve(entry.target);
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-    Array.prototype.forEach.call(targets, function (el) { io.observe(el); });
+  function revealAll() {
+    pending.forEach(function (el) { el.classList.add('in'); });
+    pending.length = 0;
   }
+
+  function sweep() {
+    if (!pending.length) return;
+    var limit = window.innerHeight * 0.92;
+    for (var i = pending.length - 1; i >= 0; i--) {
+      if (pending[i].getBoundingClientRect().top < limit) {
+        pending[i].classList.add('in');
+        pending.splice(i, 1);
+      }
+    }
+  }
+
+  if (reduce) revealAll();
 
   /* ---------- 3. header que se compacta ---------- */
   var header = document.getElementById('header');
@@ -966,6 +1012,7 @@
   function onFrame() {
     var y = window.scrollY;
 
+    sweep();
     header.classList.toggle('is-stuck', y > 40);
 
     /* parallax suave sobre la foto del hero */
@@ -984,11 +1031,17 @@
     ticking = false;
   }
 
-  window.addEventListener('scroll', function () {
+  function schedule() {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(onFrame);
-  }, { passive: true });
+  }
+
+  window.addEventListener('scroll', schedule, { passive: true });
+  /* al cambiar el tamano o al terminar de cargar las fotos la maquetacion
+     se mueve, asi que hay que volver a medir */
+  window.addEventListener('resize', schedule, { passive: true });
+  window.addEventListener('load', schedule);
 
   /* el marquee vuelve a su sitio cuando el scroll se detiene */
   if (track && !reduce) {
