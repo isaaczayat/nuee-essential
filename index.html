@@ -300,8 +300,17 @@
   .buy .ph img { object-fit: contain; }
   .buy__panel { display: flex; flex-direction: column; gap: 1.5rem; }
 
-  .price { display: flex; align-items: baseline; gap: .9rem; font-variant-numeric: tabular-nums; }
+  .price { display: flex; align-items: baseline; flex-wrap: wrap; gap: .9rem; font-variant-numeric: tabular-nums; }
   .price strong { font-size: 1.9rem; font-weight: 500; letter-spacing: .01em; }
+  .price .ship {
+    font-size: .64rem;
+    text-transform: uppercase;
+    letter-spacing: .2em;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: .45em .8em;
+    align-self: center;
+  }
 
   .colorway { display: flex; align-items: center; gap: .8rem; }
   .sw {
@@ -423,7 +432,7 @@
 
 
 <div class="announce">
-  Doble compartimento &nbsp;·&nbsp; <span>Superficie que repele el agua</span> &nbsp;·&nbsp; 23 × 17 × 15 cm
+  <span>Envío gratis en todos los pedidos</span> &nbsp;·&nbsp; Doble compartimento &nbsp;·&nbsp; 23 × 17 × 15 cm
 </div>
 
 <header class="header">
@@ -529,8 +538,9 @@
         </div>
 
         <div class="price">
-          <strong>$1,290</strong>
+          <strong>$399</strong>
           <span class="label" style="letter-spacing:.16em">MXN</span>
+          <span class="ship">Envío gratis</span>
         </div>
 
         <div class="colorway">
@@ -547,7 +557,7 @@
         </ul>
 
         <a class="btn" href="#comprar">Añadir a la bolsa</a>
-        <p class="lede" style="font-size:.82rem">La superficie repele el agua: se limpia con un paño húmedo.</p>
+        <p class="lede" style="font-size:.82rem">Envío gratis en todos los pedidos. La superficie repele el agua: se limpia con un paño húmedo.</p>
       </div>
     </div>
   </section>
@@ -556,8 +566,8 @@
   <section class="section--ink" style="padding-block:0">
     <div class="marquee" aria-hidden="true">
       <div class="marquee__track">
-        <span>Acabado tipo piel</span><span>Doble compartimento</span><span>Repele el agua</span><span>Tiradores dorados</span><span>Banda para brochas</span><span>23 × 17 × 15 cm</span>
-        <span>Acabado tipo piel</span><span>Doble compartimento</span><span>Repele el agua</span><span>Tiradores dorados</span><span>Banda para brochas</span><span>23 × 17 × 15 cm</span>
+        <span>Envío gratis</span><span>Acabado tipo piel</span><span>Doble compartimento</span><span>Repele el agua</span><span>Tiradores dorados</span><span>23 × 17 × 15 cm</span>
+        <span>Envío gratis</span><span>Acabado tipo piel</span><span>Doble compartimento</span><span>Repele el agua</span><span>Tiradores dorados</span><span>23 × 17 × 15 cm</span>
       </div>
     </div>
   </section>
