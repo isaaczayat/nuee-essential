@@ -1266,7 +1266,7 @@
           <li><span>Interior</span><span>Banda para brochas</span></li>
         </ul>
 
-        <a class="btn rv" style="--d:400ms" href="#comprar">Añadir a la bolsa</a>
+        <a class="btn rv" style="--d:400ms" href="#comprar" data-buy>Añadir a la bolsa</a>
         <p class="lede rv" style="--d:470ms; font-size:.82rem">Envío gratis en todos los pedidos. La superficie repele el agua: se limpia con un paño húmedo.</p>
       </div>
     </div>
@@ -1378,7 +1378,7 @@
       <b>Nuée Essential</b>
       <span>$399 MXN · Envío gratis</span>
     </div>
-    <a class="btn" href="#comprar">Añadir a la bolsa</a>
+    <a class="btn" href="#comprar" data-buy>Añadir a la bolsa</a>
   </div>
 </div>
 
@@ -1387,6 +1387,20 @@
 <script>
 (function () {
   'use strict';
+
+  /* ============================================================
+     PAGOS — pega aqui el enlace de pago de Stripe, entre comillas.
+     Ejemplo: 'https://buy.stripe.com/xxxxxxxxxxxx'
+     Mientras siga vacio, los botones de compra llevan a la ficha de
+     producto en lugar de a un enlace roto.
+     ============================================================ */
+  var CHECKOUT_URL = '';
+
+  if (CHECKOUT_URL) {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-buy]'), function (a) {
+      a.href = CHECKOUT_URL;
+    });
+  }
 
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var main = document.getElementById('top');
