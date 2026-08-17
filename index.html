@@ -865,6 +865,145 @@
   .ph.tile:hover img { transform: translate3d(0, var(--py, 0px), 0) scale(1.05); }
 
   /* ============================================================
+     COMPARADOR ARRASTRABLE — cerrado / abierto
+     ============================================================ */
+  .cmp {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    max-width: 760px;
+    margin-inline: auto;
+    overflow: hidden;
+    background: var(--shell);
+    cursor: ew-resize;
+    touch-action: pan-y;
+    user-select: none;
+  }
+  /* sin pointer-events el navegador arranca su arrastre nativo de imagen
+     al segundo movimiento y cancela la secuencia de puntero */
+  .cmp img { position: absolute; inset: 0; pointer-events: none; -webkit-user-drag: none; }
+  .cmp__b { position: absolute; inset: 0; clip-path: inset(0 0 0 var(--x, 50%)); }
+
+  .cmp__bar {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: var(--x, 50%);
+    width: 2px;
+    margin-left: -1px;
+    background: var(--paper);
+    box-shadow: 0 0 22px rgba(23,21,15,.5);
+    z-index: 3;
+  }
+  .cmp__bar::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 52px; height: 52px;
+    margin: -26px 0 0 -26px;
+    border-radius: 50%;
+    background: var(--paper);
+    box-shadow: 0 8px 26px rgba(23,21,15,.42);
+    transition: transform .4s var(--ease-out);
+  }
+  .cmp__bar::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    z-index: 1;
+    width: 26px; height: 8px;
+    margin: -4px 0 0 -13px;
+    background:
+      linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 100%) 0 0/9px 8px repeat-x;
+    opacity: .75;
+    transition: transform .4s var(--ease-out);
+  }
+  .cmp:hover .cmp__bar::after, .cmp__bar:focus-visible::after { transform: scale(1.12); }
+
+  .cmp__tag {
+    position: absolute;
+    bottom: 16px;
+    z-index: 2;
+    font-family: var(--display);
+    font-size: .62rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    background: rgba(23,21,15,.72);
+    color: var(--paper);
+    padding: .5em .9em;
+  }
+  .cmp__tag--l { left: 16px; }
+  .cmp__tag--r { right: 16px; }
+
+  /* ============================================================
+     GALERIA DE PRODUCTO
+     ============================================================ */
+  .gal { display: flex; flex-direction: column; gap: .8rem; }
+  .gal__frame { position: relative; }
+  .gal__track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    background: #fff;
+    border: 1px solid var(--line);
+  }
+  .gal__track::-webkit-scrollbar { display: none; }
+  .gal__slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    margin: 0;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #fff;
+  }
+  .gal__slide img { object-fit: contain; }
+
+  .gal__nav {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    width: 44px; height: 44px;
+    margin-top: -22px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    background: rgba(251,248,242,.92);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background .3s ease, color .3s ease, opacity .3s ease;
+  }
+  .gal__nav:hover { background: var(--ink); color: var(--paper); }
+  .gal__nav[disabled] { opacity: .3; cursor: default; }
+  .gal__nav--prev { left: 12px; }
+  .gal__nav--next { right: 12px; }
+  .gal__nav svg { width: 15px; height: 15px; }
+
+  .gal__foot { display: flex; align-items: center; gap: .8rem; }
+  .gal__thumbs { display: flex; gap: .5rem; list-style: none; margin: 0; padding: 0; }
+  .gal__thumbs button {
+    width: 52px; height: 52px;
+    padding: 0;
+    border: 1px solid var(--line);
+    background: #fff;
+    cursor: pointer;
+    opacity: .55;
+    transition: opacity .35s ease, border-color .35s ease;
+  }
+  .gal__thumbs button img { object-fit: contain; }
+  .gal__thumbs button:hover { opacity: .85; }
+  .gal__thumbs button[aria-current="true"] { opacity: 1; border-color: var(--ink); }
+  .gal__count {
+    margin-left: auto;
+    font-family: var(--display);
+    font-size: .68rem;
+    letter-spacing: .18em;
+    color: var(--smoke);
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 520px) {
+    .gal__thumbs button { width: 42px; height: 42px; }
+  }
+
+  /* ============================================================
      MOVIMIENTO REDUCIDO — todo llega a su estado final al instante
      ============================================================ */
   @media (prefers-reduced-motion: reduce) {
@@ -1013,6 +1152,29 @@
     </div>
   </section>
 
+  <!-- ===================== COMPARADOR ===================== -->
+  <section class="section section--shell" id="comparador">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-head__text">
+          <p class="label rv">Cerrado o abierto</p>
+          <h2 class="display d-lg rv" style="--d:80ms">Arrastra para ver</h2>
+        </div>
+        <p class="lede rv" style="--d:160ms">De pieza cerrada sobre el tocador a los dos niveles abiertos. Mueve el tirador de un lado a otro.</p>
+      </div>
+
+      <div class="cmp rv-wipe" id="cmp" style="--x:50%">
+        <img src="img/ambiente.jpg" alt="El neceser cerrado sobre la mesa">
+        <div class="cmp__b"><img src="img/abierto.jpg" alt="El mismo neceser abierto, con los dos niveles a la vista"></div>
+        <span class="cmp__tag cmp__tag--l">Cerrado</span>
+        <span class="cmp__tag cmp__tag--r">Abierto</span>
+        <div class="cmp__bar" id="cmpBar" role="slider" tabindex="0"
+             aria-label="Comparar cerrado y abierto"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===================== DETALLES ===================== -->
   <section class="section" id="detalles">
     <div class="wrap">
@@ -1050,8 +1212,33 @@
   <!-- ===================== COMPRAR ===================== -->
   <section class="section section--shell" id="comprar">
     <div class="wrap buy">
-      <div class="ph sheen rv-wipe zoom" id="zoomBox">
-        <img src="img/packshot.jpg" alt="NUÉE Essential en color crema, vista frontal">
+      <div class="gal rv-wipe" id="gal">
+        <div class="gal__frame">
+          <div class="gal__track" id="galTrack" tabindex="0" role="group" aria-label="Fotos del producto">
+            <figure class="gal__slide zoom"><img src="img/packshot.jpg" alt="NUÉE Essential cerrado, vista frontal"></figure>
+            <figure class="gal__slide zoom"><img src="img/ambiente.jpg" alt="El neceser sobre un tocador de madera"></figure>
+            <figure class="gal__slide zoom"><img src="img/abierto.jpg" alt="El neceser abierto con la tapa transparente levantada"></figure>
+            <figure class="gal__slide zoom"><img src="img/capacidad.jpg" alt="El interior con brochas arriba y maquillaje en la base"></figure>
+            <figure class="gal__slide zoom"><img src="img/modelo.jpg" alt="Mujer sosteniendo el neceser por el asa"></figure>
+          </div>
+          <button class="gal__nav gal__nav--prev" id="galPrev" aria-label="Foto anterior">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="gal__nav gal__nav--next" id="galNext" aria-label="Foto siguiente">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <div class="gal__foot">
+          <ul class="gal__thumbs" id="galThumbs">
+            <li><button type="button" data-i="0" aria-label="Ver foto 1"><img src="img/packshot.jpg" alt=""></button></li>
+            <li><button type="button" data-i="1" aria-label="Ver foto 2"><img src="img/ambiente.jpg" alt=""></button></li>
+            <li><button type="button" data-i="2" aria-label="Ver foto 3"><img src="img/abierto.jpg" alt=""></button></li>
+            <li><button type="button" data-i="3" aria-label="Ver foto 4"><img src="img/capacidad.jpg" alt=""></button></li>
+            <li><button type="button" data-i="4" aria-label="Ver foto 5"><img src="img/modelo.jpg" alt=""></button></li>
+          </ul>
+          <span class="gal__count" id="galCount">01 / 05</span>
+        </div>
       </div>
 
       <div class="buy__panel">
@@ -1406,24 +1593,120 @@
     });
   }
 
-  /* ---------- 7. lupa sobre el producto ---------- */
-  var zoomBox = document.getElementById('zoomBox');
-  if (fine && !reduce && zoomBox) {
-    var zImg = zoomBox.querySelector('img');
-    zoomBox.addEventListener('mouseenter', function () { zoomBox.classList.add('is-zoom'); });
-    zoomBox.addEventListener('mouseleave', function () {
-      zoomBox.classList.remove('is-zoom');
-      zImg.style.transformOrigin = 'center';
-    });
-    zoomBox.addEventListener('mousemove', function (e) {
-      var r = zoomBox.getBoundingClientRect();
-      zImg.style.transformOrigin =
-        (((e.clientX - r.left) / r.width) * 100).toFixed(1) + '% ' +
-        (((e.clientY - r.top) / r.height) * 100).toFixed(1) + '%';
+  /* ---------- 7. lupa sobre cada foto del producto ---------- */
+  if (fine && !reduce) {
+    Array.prototype.forEach.call(document.querySelectorAll('.zoom'), function (box) {
+      var zImg = box.querySelector('img');
+      if (!zImg) return;
+      box.addEventListener('mouseenter', function () { box.classList.add('is-zoom'); });
+      box.addEventListener('mouseleave', function () {
+        box.classList.remove('is-zoom');
+        zImg.style.transformOrigin = 'center';
+      });
+      box.addEventListener('mousemove', function (e) {
+        var r = box.getBoundingClientRect();
+        zImg.style.transformOrigin =
+          (((e.clientX - r.left) / r.width) * 100).toFixed(1) + '% ' +
+          (((e.clientY - r.top) / r.height) * 100).toFixed(1) + '%';
+      });
     });
   }
 
-  /* ---------- 8. newsletter ---------- */
+  /* ---------- 8. galeria de producto ---------- */
+  var galTrack = document.getElementById('galTrack');
+  if (galTrack) {
+    var slides = galTrack.children;
+    var thumbs = Array.prototype.slice.call(document.querySelectorAll('#galThumbs button'));
+    var galPrev = document.getElementById('galPrev');
+    var galNext = document.getElementById('galNext');
+    var galCount = document.getElementById('galCount');
+    var last = slides.length - 1;
+    var galTick = false;
+
+    var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+
+    var galGo = function (i) {
+      i = i < 0 ? 0 : (i > last ? last : i);
+      galTrack.scrollTo({ left: i * galTrack.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
+    };
+
+    var galSync = function () {
+      var w = galTrack.clientWidth || 1;
+      var i = Math.round(galTrack.scrollLeft / w);
+      i = i < 0 ? 0 : (i > last ? last : i);
+      galCount.textContent = pad(i + 1) + ' / ' + pad(slides.length);
+      thumbs.forEach(function (b, n) { b.setAttribute('aria-current', n === i ? 'true' : 'false'); });
+      galPrev.disabled = i === 0;
+      galNext.disabled = i === last;
+      galTick = false;
+    };
+
+    galTrack.addEventListener('scroll', function () {
+      if (galTick) return;
+      galTick = true;
+      requestAnimationFrame(galSync);
+    }, { passive: true });
+
+    galPrev.addEventListener('click', function () { galGo(Math.round(galTrack.scrollLeft / galTrack.clientWidth) - 1); });
+    galNext.addEventListener('click', function () { galGo(Math.round(galTrack.scrollLeft / galTrack.clientWidth) + 1); });
+    thumbs.forEach(function (b) {
+      b.addEventListener('click', function () { galGo(parseInt(b.getAttribute('data-i'), 10)); });
+    });
+    galTrack.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      var cur = Math.round(galTrack.scrollLeft / galTrack.clientWidth);
+      galGo(cur + (e.key === 'ArrowRight' ? 1 : -1));
+    });
+    window.addEventListener('resize', galSync, { passive: true });
+    galSync();
+  }
+
+  /* ---------- 9. comparador cerrado / abierto ---------- */
+  var cmp = document.getElementById('cmp');
+  var cmpBar = document.getElementById('cmpBar');
+  if (cmp && cmpBar) {
+    var dragging = false;
+
+    var setX = function (pct) {
+      pct = pct < 2 ? 2 : (pct > 98 ? 98 : pct);
+      cmp.style.setProperty('--x', pct.toFixed(1) + '%');
+      cmpBar.setAttribute('aria-valuenow', Math.round(pct));
+    };
+    var fromPointer = function (clientX) {
+      var r = cmp.getBoundingClientRect();
+      setX(((clientX - r.left) / r.width) * 100);
+    };
+
+    cmp.addEventListener('dragstart', function (e) { e.preventDefault(); });
+    cmp.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      dragging = true;
+      try { cmp.setPointerCapture(e.pointerId); } catch (err) {}
+      fromPointer(e.clientX);
+    });
+    cmp.addEventListener('pointermove', function (e) { if (dragging) fromPointer(e.clientX); });
+    var stop = function (e) {
+      dragging = false;
+      if (e && e.pointerId != null) { try { cmp.releasePointerCapture(e.pointerId); } catch (err) {} }
+    };
+    cmp.addEventListener('pointerup', stop);
+    cmp.addEventListener('pointercancel', stop);
+
+    cmpBar.addEventListener('keydown', function (e) {
+      var step = 0;
+      if (e.key === 'ArrowLeft') step = -4;
+      else if (e.key === 'ArrowRight') step = 4;
+      else if (e.key === 'Home') step = -100;
+      else if (e.key === 'End') step = 100;
+      else return;
+      e.preventDefault();
+      setX((parseFloat(cmpBar.getAttribute('aria-valuenow')) || 50) + step);
+    });
+  }
+
+  /* ---------- 10. newsletter ---------- */
+
   var form = document.getElementById('newsForm');
   form.addEventListener('submit', function (e) {
     e.preventDefault();
