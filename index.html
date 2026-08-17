@@ -674,6 +674,197 @@
   @media (max-width: 760px) { .footer__cols { grid-template-columns: 1fr 1fr; } }
 
   /* ============================================================
+     EXPLORAR LA PIEZA — puntos sobre la foto abierta
+     ============================================================ */
+  .explore { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 4vw, 4rem); align-items: center; }
+  @media (max-width: 900px) { .explore { grid-template-columns: 1fr; } }
+
+  /* la foto se recorta (overflow + clip-path del revelado) pero los rotulos
+     salen fuera de ella, asi que el marco de posicionamiento va aparte */
+  .stage { position: relative; }
+  .stage__img { aspect-ratio: 1 / 1; background: var(--shell); }
+
+  .hs {
+    position: absolute;
+    width: 34px; height: 34px;
+    margin: -17px 0 0 -17px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .hs__dot {
+    position: absolute;
+    inset: 11px;
+    border-radius: 50%;
+    background: var(--paper);
+    box-shadow: 0 2px 10px rgba(23,21,15,.45);
+    transition: transform .45s var(--ease-out), background .3s ease;
+  }
+  .hs__dot::after {
+    content: "";
+    position: absolute;
+    inset: -11px;
+    border-radius: 50%;
+    border: 1px solid var(--paper);
+    opacity: .8;
+    animation: ping 2.6s var(--ease) infinite;
+  }
+  @keyframes ping {
+    0%   { transform: scale(.55); opacity: .85; }
+    70%  { transform: scale(1.15); opacity: 0; }
+    100% { transform: scale(1.15); opacity: 0; }
+  }
+  .hs:hover .hs__dot, .hs.is-open .hs__dot { transform: scale(1.45); background: var(--gold-lt); }
+  .hs.is-open .hs__dot::after { animation: none; opacity: 0; }
+
+  .hs__card {
+    position: absolute;
+    top: 26px; left: 50%;
+    width: max-content;
+    max-width: min(240px, 52vw);
+    transform: translate(-50%, 6px);
+    background: var(--paper);
+    color: var(--ink);
+    text-align: left;
+    padding: .85rem 1rem;
+    box-shadow: 0 18px 40px -22px rgba(23,21,15,.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .38s var(--ease), transform .38s var(--ease-out), visibility .38s;
+    pointer-events: none;
+  }
+  .hs.is-open .hs__card { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+  .hs--flip .hs__card { top: auto; bottom: 26px; transform: translate(-50%, -6px); }
+  .hs--flip.is-open .hs__card { transform: translate(-50%, 0); }
+  .hs__card b { display: block; font-size: .74rem; letter-spacing: .18em; text-transform: uppercase; margin-bottom: .35rem; }
+  .hs__card span { display: block; font-size: .82rem; line-height: 1.5; color: var(--smoke); }
+
+  .explore__list { list-style: none; margin: 0; padding: 0; display: grid; gap: .2rem; }
+  .explore__list button {
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 1rem .2rem;
+    font: inherit;
+    text-align: left;
+    color: var(--smoke);
+    cursor: pointer;
+    transition: color .35s var(--ease), padding-left .45s var(--ease-out);
+  }
+  .explore__list button:hover, .explore__list button[aria-current="true"] { color: var(--ink); padding-left: .55rem; }
+  .explore__list em {
+    font-style: normal;
+    font-family: var(--display);
+    font-size: .72rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--ink);
+    flex: none;
+    width: 12rem;
+  }
+  .explore__list span { font-size: .86rem; }
+  @media (max-width: 520px) {
+    .explore__list button { flex-wrap: wrap; gap: .3rem; }
+    .explore__list em { width: 100%; }
+  }
+
+  /* ============================================================
+     MANIFIESTO — cada palabra se enciende con el scroll
+     ============================================================ */
+  .manifesto p {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    line-height: 1.32;
+    font-size: clamp(1.5rem, 4.2vw, 3.1rem);
+    max-width: 22ch;
+  }
+  .mw { transition: opacity .5s var(--ease), color .5s var(--ease); }
+  .js .mw { opacity: .18; }
+  .js .mw.on { opacity: 1; }
+  .mw.accent { color: var(--gold-lt); }
+
+  /* ============================================================
+     BARRA DE COMPRA FIJA
+     ============================================================ */
+  .stickybar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 60;
+    background: rgba(251,248,242,.94);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    transform: translateY(110%);
+    transition: transform .6s var(--ease-out);
+  }
+  .stickybar.is-up { transform: none; }
+  .stickybar__inner {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding-block: .8rem;
+  }
+  .stickybar figure { margin: 0; width: 46px; height: 46px; background: #fff; border: 1px solid var(--line); flex: none; }
+  .stickybar figure img { object-fit: contain; }
+  .stickybar__txt { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+  .stickybar__txt b { font-family: var(--display); font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; font-weight: 500; }
+  .stickybar__txt span { font-size: .74rem; color: var(--smoke); }
+  .stickybar .btn { margin-left: auto; padding: .95em 1.9em; flex: none; }
+  @media (max-width: 620px) {
+    .stickybar figure { display: none; }
+    .stickybar .btn { padding: .95em 1.2em; font-size: .68rem; letter-spacing: .14em; }
+  }
+
+  /* ============================================================
+     MICRO-INTERACCIONES DE PUNTERO (solo raton fino)
+     ============================================================ */
+  .cursor { display: none; }
+  @media (hover: hover) and (pointer: fine) {
+    .js .cursor {
+      display: grid;
+      place-items: center;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 90;
+      width: 74px; height: 74px;
+      margin: -37px 0 0 -37px;
+      border-radius: 50%;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--display);
+      font-size: .6rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(.4);
+      transition: opacity .35s var(--ease), transform .45s var(--ease-out);
+      will-change: transform;
+    }
+    .js .cursor.on { opacity: 1; transform: scale(1); }
+  }
+
+  /* lupa sobre el producto */
+  .zoom img { transition: transform .5s var(--ease-out); }
+  .zoom.is-zoom img { transform: scale(1.9); }
+
+  /* la imagen del mosaico compone parallax y hover sin pisarse; la
+     transicion mas corta amortigua el seguimiento en vez de retrasarlo */
+  .tile img {
+    transform: translate3d(0, var(--py, 0px), 0) scale(var(--ps, 1));
+    transition: transform .6s var(--ease-out);
+  }
+  .ph.tile:hover img { transform: translate3d(0, var(--py, 0px), 0) scale(1.05); }
+
+  /* ============================================================
      MOVIMIENTO REDUCIDO — todo llega a su estado final al instante
      ============================================================ */
   @media (prefers-reduced-motion: reduce) {
@@ -693,6 +884,10 @@
     .js .zip { transform: scaleX(1) !important; }
     .scroll-cue { display: none; }
     .sheen::after { display: none; }
+    .js .mw { opacity: 1 !important; }
+    .hs__dot::after { animation: none !important; opacity: 0; }
+    .js .cursor { display: none !important; }
+    .stickybar { transition: none; }
   }
 </style>
 </head>
@@ -777,6 +972,47 @@
 
   <div class="wrap"><div class="zip-mask"><div class="zip"></div></div></div>
 
+  <!-- ===================== EXPLORAR ===================== -->
+  <section class="section" id="explora">
+    <div class="wrap explore">
+      <div class="stage" id="stage">
+        <div class="ph rv-wipe stage__img">
+          <img src="img/abierto.jpg" alt="El neceser abierto sobre una mesa de madera, con la tapa transparente levantada">
+        </div>
+
+        <button class="hs" style="left:40%; top:20%" data-hs="0" aria-expanded="false">
+          <span class="hs__dot"></span>
+          <span class="hs__card"><b>Tapa transparente</b><span>Ves lo que hay dentro sin abrirla.</span></span>
+        </button>
+        <button class="hs" style="left:56%; top:47%" data-hs="1" aria-expanded="false">
+          <span class="hs__dot"></span>
+          <span class="hs__card"><b>Nivel superior</b><span>Para lo que usas cada día, a mano.</span></span>
+        </button>
+        <button class="hs hs--flip" style="left:26%; top:60%" data-hs="2" aria-expanded="false">
+          <span class="hs__dot"></span>
+          <span class="hs__card"><b>Cierres independientes</b><span>Cada nivel se abre por su lado.</span></span>
+        </button>
+        <button class="hs hs--flip" style="left:58%; top:80%" data-hs="3" aria-expanded="false">
+          <span class="hs__dot"></span>
+          <span class="hs__card"><b>Base honda</b><span>Base, polvos y labiales, de pie.</span></span>
+        </button>
+      </div>
+
+      <div>
+        <div class="sec-head__text rv" style="margin-bottom:1.8rem">
+          <p class="label">Explora la pieza</p>
+          <h2 class="display d-lg">Por dentro</h2>
+        </div>
+        <ul class="explore__list rv" style="--d:100ms">
+          <li><button type="button" data-go="0"><em>Tapa transparente</em><span>Ves lo que hay dentro sin abrirla.</span></button></li>
+          <li><button type="button" data-go="1"><em>Nivel superior</em><span>Para lo que usas cada día, a mano.</span></button></li>
+          <li><button type="button" data-go="2"><em>Cierres independientes</em><span>Cada nivel se abre por su lado.</span></button></li>
+          <li><button type="button" data-go="3"><em>Base honda</em><span>Base, polvos y labiales, de pie.</span></button></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <!-- ===================== DETALLES ===================== -->
   <section class="section" id="detalles">
     <div class="wrap">
@@ -804,10 +1040,17 @@
     </div>
   </section>
 
+  <!-- ===================== MANIFIESTO ===================== -->
+  <section class="section section--ink manifesto" id="manifiesto">
+    <div class="wrap">
+      <p class="display" id="mfText"><span class="mw">No</span> <span class="mw">elijas</span> <span class="mw">entre</span> <span class="mw">llevarlo</span> <span class="mw">todo</span> <span class="mw">y</span> <span class="mw accent">encontrarlo</span> <span class="mw accent">rápido.</span></p>
+    </div>
+  </section>
+
   <!-- ===================== COMPRAR ===================== -->
   <section class="section section--shell" id="comprar">
     <div class="wrap buy">
-      <div class="ph sheen rv-wipe">
+      <div class="ph sheen rv-wipe zoom" id="zoomBox">
         <img src="img/packshot.jpg" alt="NUÉE Essential en color crema, vista frontal">
       </div>
 
@@ -940,6 +1183,20 @@
   </div>
 </footer>
 
+<!-- barra de compra que sube cuando la ficha ya ha pasado -->
+<div class="stickybar" id="stickybar">
+  <div class="wrap stickybar__inner">
+    <figure><img src="img/packshot.jpg" alt=""></figure>
+    <div class="stickybar__txt">
+      <b>Nuée Essential</b>
+      <span>$399 MXN · Envío gratis</span>
+    </div>
+    <a class="btn" href="#comprar">Añadir a la bolsa</a>
+  </div>
+</div>
+
+<div class="cursor" id="cursor" aria-hidden="true">Ver</div>
+
 <script>
 (function () {
   'use strict';
@@ -1005,6 +1262,10 @@
   var header = document.getElementById('header');
   var heroImg = document.getElementById('heroImg');
   var track = document.getElementById('mqTrack');
+  var mfWords = Array.prototype.slice.call(document.querySelectorAll('.mw'));
+  var buySection = document.getElementById('comprar');
+  var stickybar = document.getElementById('stickybar');
+  var tileImgs = Array.prototype.slice.call(document.querySelectorAll('.tile img'));
   var lastY = window.scrollY;
   var skew = 0;
   var ticking = false;
@@ -1025,6 +1286,37 @@
       var v = y - lastY;
       skew = Math.max(-7, Math.min(7, v * 0.28));
       track.style.setProperty('--skew', skew.toFixed(2) + 'deg');
+    }
+
+    var vh = window.innerHeight;
+
+    /* el manifiesto se enciende palabra a palabra segun avanza el scroll */
+    if (mfWords.length && !reduce) {
+      var mr = mfWords[0].parentNode.getBoundingClientRect();
+      var p = (vh * 0.82 - mr.top) / (vh * 0.5);
+      p = p < 0 ? 0 : (p > 1 ? 1 : p);
+      var lit = Math.round(p * mfWords.length);
+      for (var i = 0; i < mfWords.length; i++) {
+        mfWords[i].classList.toggle('on', i < lit);
+      }
+    }
+
+    /* la barra de compra sube cuando la ficha ya quedo atras y se retira
+       al llegar al pie, para no taparlo */
+    if (stickybar && buySection) {
+      var br = buySection.getBoundingClientRect();
+      var atBottom = y + vh > document.documentElement.scrollHeight - 140;
+      stickybar.classList.toggle('is-up', br.bottom < 0 && !atBottom);
+    }
+
+    /* cada foto del mosaico se mueve a su propio ritmo */
+    if (tileImgs.length && !reduce) {
+      for (var j = 0; j < tileImgs.length; j++) {
+        var tr = tileImgs[j].parentNode.getBoundingClientRect();
+        if (tr.bottom < -200 || tr.top > vh + 200) continue;
+        var off = (tr.top + tr.height / 2 - vh / 2) * -0.05;
+        tileImgs[j].style.setProperty('--py', off.toFixed(1) + 'px');
+      }
     }
 
     lastY = y;
@@ -1054,7 +1346,84 @@
 
   onFrame();
 
-  /* ---------- 4. newsletter ---------- */
+  /* ---------- 4. puntos sobre la pieza ---------- */
+  var spots = Array.prototype.slice.call(document.querySelectorAll('.hs'));
+  var listBtns = Array.prototype.slice.call(document.querySelectorAll('[data-go]'));
+  var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  function openSpot(i) {
+    spots.forEach(function (s, n) {
+      var on = n === i;
+      s.classList.toggle('is-open', on);
+      s.setAttribute('aria-expanded', on ? 'true' : 'false');
+    });
+    listBtns.forEach(function (b, n) {
+      b.setAttribute('aria-current', n === i ? 'true' : 'false');
+    });
+  }
+
+  spots.forEach(function (s, i) {
+    s.addEventListener('click', function (e) {
+      e.preventDefault();
+      openSpot(s.classList.contains('is-open') ? -1 : i);
+    });
+    if (fine) {
+      s.addEventListener('mouseenter', function () { openSpot(i); });
+      s.addEventListener('focus', function () { openSpot(i); });
+    }
+  });
+  listBtns.forEach(function (b, i) {
+    b.addEventListener('click', function () { openSpot(i); });
+    if (fine) b.addEventListener('mouseenter', function () { openSpot(i); });
+  });
+
+  /* ---------- 5. cursor propio sobre las fotos ---------- */
+  var cursor = document.getElementById('cursor');
+  if (fine && !reduce && cursor) {
+    var cx = 0, cy = 0, cvis = false;
+    document.addEventListener('mousemove', function (e) {
+      cx = e.clientX; cy = e.clientY;
+      cursor.style.transform = 'translate3d(' + cx + 'px,' + cy + 'px,0)' + (cvis ? ' scale(1)' : ' scale(.4)');
+      var over = e.target.closest && e.target.closest('.tile, .stage');
+      if (!!over !== cvis) {
+        cvis = !!over;
+        cursor.classList.toggle('on', cvis);
+        cursor.textContent = over && over.classList.contains('stage') ? 'Toca' : 'Ver';
+      }
+    }, { passive: true });
+  }
+
+  /* ---------- 6. botones magneticos ---------- */
+  if (fine && !reduce) {
+    Array.prototype.forEach.call(document.querySelectorAll('.btn'), function (b) {
+      b.addEventListener('mousemove', function (e) {
+        var r = b.getBoundingClientRect();
+        var dx = (e.clientX - (r.left + r.width / 2)) * 0.16;
+        var dy = (e.clientY - (r.top + r.height / 2)) * 0.28;
+        b.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px)';
+      });
+      b.addEventListener('mouseleave', function () { b.style.transform = ''; });
+    });
+  }
+
+  /* ---------- 7. lupa sobre el producto ---------- */
+  var zoomBox = document.getElementById('zoomBox');
+  if (fine && !reduce && zoomBox) {
+    var zImg = zoomBox.querySelector('img');
+    zoomBox.addEventListener('mouseenter', function () { zoomBox.classList.add('is-zoom'); });
+    zoomBox.addEventListener('mouseleave', function () {
+      zoomBox.classList.remove('is-zoom');
+      zImg.style.transformOrigin = 'center';
+    });
+    zoomBox.addEventListener('mousemove', function (e) {
+      var r = zoomBox.getBoundingClientRect();
+      zImg.style.transformOrigin =
+        (((e.clientX - r.left) / r.width) * 100).toFixed(1) + '% ' +
+        (((e.clientY - r.top) / r.height) * 100).toFixed(1) + '%';
+    });
+  }
+
+  /* ---------- 8. newsletter ---------- */
   var form = document.getElementById('newsForm');
   form.addEventListener('submit', function (e) {
     e.preventDefault();
